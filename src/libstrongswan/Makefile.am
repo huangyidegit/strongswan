@@ -30,7 +30,7 @@ credentials/sets/auth_cfg_wrapper.c credentials/sets/ocsp_response_wrapper.c \
 credentials/sets/cert_cache.c credentials/sets/mem_cred.c \
 credentials/sets/callback_cred.c credentials/auth_cfg.c database/database.c \
 database/database_factory.c fetcher/fetcher.c fetcher/fetcher_manager.c eap/eap.c \
-ipsec/ipsec_types.c \
+ipsec/ipsec_types.c ipsec/sec_label.c \
 networking/host.c networking/host_resolver.c networking/packet.c \
 networking/tun_device.c networking/streams/stream_manager.c \
 networking/streams/stream.c networking/streams/stream_service.c \
@@ -98,7 +98,7 @@ credentials/sets/ocsp_response_wrapper.h credentials/sets/cert_cache.h \
 credentials/sets/mem_cred.h credentials/sets/callback_cred.h \
 credentials/auth_cfg.h credentials/credential_set.h credentials/cert_validator.h \
 database/database.h database/database_factory.h fetcher/fetcher.h \
-fetcher/fetcher_manager.h eap/eap.h pen/pen.h ipsec/ipsec_types.h \
+fetcher/fetcher_manager.h eap/eap.h pen/pen.h ipsec/ipsec_types.h ipsec/sec_label.h \
 networking/host.h networking/host_resolver.h networking/packet.h \
 networking/tun_device.h networking/streams/stream.h \
 networking/streams/stream_unix.h networking/streams/stream_service_unix.h \
