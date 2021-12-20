@@ -210,6 +210,7 @@ static void schedule_delayed_retry(private_child_create_t *this)
 	task->use_reqid(task, this->child.reqid);
 	task->use_marks(task, this->child.mark_in, this->child.mark_out);
 	task->use_if_ids(task, this->child.if_id_in, this->child.if_id_out);
+	task->use_label(task, this->child.label);
 
 	DBG1(DBG_IKE, "creating CHILD_SA failed, trying again in %d seconds",
 		 retry);
@@ -1235,6 +1236,7 @@ METHOD(task_t, build_i, status_t,
 												  this->dh_group == MODP_NONE);
 	this->mode = this->config->get_mode(this->config);
 
+	// FIXME: get label we want to negotiate if we don't have one already
 	this->child.if_id_in_def = this->ike_sa->get_if_id(this->ike_sa, TRUE);
 	this->child.if_id_out_def = this->ike_sa->get_if_id(this->ike_sa, FALSE);
 	this->child.encap = this->ike_sa->has_condition(this->ike_sa, COND_NAT_ANY);
@@ -1576,6 +1578,7 @@ METHOD(task_t, build_r, status_t,
 	}
 	enumerator->destroy(enumerator);
 
+	// FIXME: get actual label
 	this->child.if_id_in_def = this->ike_sa->get_if_id(this->ike_sa, TRUE);
 	this->child.if_id_out_def = this->ike_sa->get_if_id(this->ike_sa, FALSE);
 	this->child.encap = this->ike_sa->has_condition(this->ike_sa, COND_NAT_ANY);
@@ -1868,6 +1871,13 @@ METHOD(child_create_t, use_if_ids, void,
 	this->child.if_id_out = out;
 }
 
+METHOD(child_create_t, use_label, void,
+	private_child_create_t *this, sec_label_t *label)
+{
+	DESTROY_IF(this->child.label);
+	this->child.label = label ? label->clone(label) : NULL;
+}
+
 METHOD(child_create_t, use_dh_group, void,
 	private_child_create_t *this, diffie_hellman_group_t dh_group)
 {
@@ -1976,6 +1986,7 @@ METHOD(task_t, destroy, void,
 	}
 	DESTROY_IF(this->config);
 	DESTROY_IF(this->nonceg);
+	DESTROY_IF(this->child.label);
 	free(this);
 }
 
@@ -1996,6 +2007,7 @@ child_create_t *child_create_create(ike_sa_t *ike_sa,
 			.use_reqid = _use_reqid,
 			.use_marks = _use_marks,
 			.use_if_ids = _use_if_ids,
+			.use_label = _use_label,
 			.use_dh_group = _use_dh_group,
 			.task = {
 				.get_type = _get_type,
