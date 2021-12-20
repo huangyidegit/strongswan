@@ -144,6 +144,11 @@ struct private_child_cfg_t {
 	mark_t set_mark_out;
 
 	/**
+	 * Optional security label for policies
+	 */
+	sec_label_t *label;
+
+	/**
 	 * Traffic Flow Confidentiality padding, if enabled
 	 */
 	uint32_t tfc;
@@ -607,7 +612,8 @@ METHOD(child_cfg_t, equals, bool,
 		this->hw_offload == other->hw_offload &&
 		this->copy_dscp == other->copy_dscp &&
 		streq(this->updown, other->updown) &&
-		streq(this->interface, other->interface);
+		streq(this->interface, other->interface) &&
+		sec_labels_equal(this->label, other->label);
 }
 
 METHOD(child_cfg_t, get_ref, child_cfg_t*,
@@ -625,6 +631,7 @@ METHOD(child_cfg_t, destroy, void,
 		this->proposals->destroy_offset(this->proposals, offsetof(proposal_t, destroy));
 		this->my_ts->destroy_offset(this->my_ts, offsetof(traffic_selector_t, destroy));
 		this->other_ts->destroy_offset(this->other_ts, offsetof(traffic_selector_t, destroy));
+		DESTROY_IF(this->label);
 		free(this->updown);
 		free(this->interface);
 		free(this->name);
@@ -685,6 +692,7 @@ child_cfg_t *child_cfg_create(char *name, child_cfg_create_t *data)
 		.mark_out = data->mark_out,
 		.set_mark_in = data->set_mark_in,
 		.set_mark_out = data->set_mark_out,
+		.label = data->label ? data->label->clone(data->label) : NULL,
 		.lifetime = data->lifetime,
 		.inactivity = data->inactivity,
 		.tfc = data->tfc,
